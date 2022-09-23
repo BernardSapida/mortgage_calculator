@@ -1,7 +1,8 @@
 <template>
   <div class="main_container p-3 rounded">
     <div class="form_container p-5 rounded">
-      <h1 class="mb-5"><strong>Mortage Calculator</strong></h1>
+      <h1 class="mb-3"><strong>Mortage Calculator</strong></h1>
+      <div class="bg-danger text-white p-3 mb-3 rounded" v-if="incomplete_form">Please complete the form!</div>
       <form @submit.prevent>
         <div class="row">
           <div class="col-4 mb-3">
@@ -43,9 +44,10 @@ export default {
   },
   data() {
     return {
+      incomplete_form: false,
       purchase_price: 0,
       down_payment: 0,
-      repayment_time: 0,
+      repayment_time: 1,
       interest_rate: 0,
       loan_amount: 0,
       monthly_mortgage: 0
@@ -53,10 +55,10 @@ export default {
   },
   computed: {
     computed_purchase_price() {
-      return this.purchase_price.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return this.purchase_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
     computed_down_payment() {
-      return this.down_payment.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return this.down_payment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
     computed_loan_amount() {
       return this.loan_amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -71,6 +73,13 @@ export default {
       let rate = interest_rate/100;
       let time_period = repayment_time*12;
 
+      if(purchase_price == 0 || down_payment == 0 || repayment_time == 0 || rate == 0) {
+        this.incomplete_form = true;
+        this.loan_amount = this.monthly_mortgage = 0;
+        return
+      }
+
+      this.incomplete_form = false;
       this.loan_amount = purchase_price - down_payment;
       this.monthly_mortgage = this.loan_amount * rate * (1 + rate)**time_period / ((1 + rate)**time_period - 1);
     }
